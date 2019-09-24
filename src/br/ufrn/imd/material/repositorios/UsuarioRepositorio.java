@@ -1,31 +1,32 @@
 package br.ufrn.imd.material.repositorios;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import br.ufrn.imd.material.dominio.Usuario;
 
+@Stateless
 public class UsuarioRepositorio 
 {
-	public static List<Usuario> usuarios;
 	
-	public static Usuario getUsuario(String login, String senha)
+	@PersistenceContext
+	private EntityManager em;
+	
+	public Usuario getUsuario(String login, String senha)
 	{
-		if(usuarios == null)
+		try
 		{
-			usuarios = new ArrayList<Usuario>();
-		}
-		Usuario usr = new Usuario("gabriel", "gabriel");
-		usr.setNome("Gabriel");
-		usuarios.add(usr);
+			Query q = em.createQuery("SELECT u FROM usuario u WHERE login = :login and senha = :senha");
+			q.setParameter("login", login);
+			q.setParameter("senha", senha);
+			
+			return (Usuario) q.getSingleResult();
 		
-		for(Usuario u : usuarios)
+		}catch (Exception e) 
 		{
-			if(u.getLogin().equals(login) && u.getSenha().equals(senha)) 
-			{
-				return u;
-			}
+			return null;
 		}
-		return null;
 	}
 }
